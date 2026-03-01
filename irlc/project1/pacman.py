@@ -64,8 +64,10 @@ def p_next(x : GameState, u: str):
         * The slightly tricky part is that when there are multiple ghosts, different actions by the individual ghosts may lead to the same final state
         * Check the probabilities sum to 1. This will be your main way of debugging your code and catching issues relating to the previous point.
     """
-    # TODO: 8 lines missing.
-    raise NotImplementedError("Return a dictionary {.., xp: p, ..} where xp is a possible next state and p the probability")
+    p_next_dict = defaultdict(float)  # This is a dictionary that will store the next states and their probabilities. You can use it like a normal dictionary, but it will return 0 for keys that are not present.
+    xp = x.next(u)  # This is the next state if there are no ghosts. You can check this by printing xp and str(xp).
+    p_next_dict[xp] += 1.0  # This is the probability of transitioning to xp. We will update this when we consider the ghosts.
+
     return states
 
 
@@ -84,8 +86,15 @@ def go_east(map):
         * Use the GymPacmanEnvironment class. The report description will contain information about how to set it up, as will pacman_demo.py
         * Use this environment to get the first GameState, then use the recommended functions to go east
     """
-    # TODO: 5 lines missing.
-    raise NotImplementedError("Return the list of states pacman will traverse if he goes east until he wins the map")
+    env = PacmanEnvironment(layout_str=map, render_mode='human')
+    x, info = env.reset()
+    states = [x]
+
+    while not x.is_won():
+        action = x.A()[0]  # This makes it take the first legal action which happens to be east in the maps we will test on. You can check this by printing x.A() and str(x) to see the map.
+        x, reward, done, info = env.step(action)
+        states.append(x)
+
     return states
 
 def get_future_states(x, N): 
