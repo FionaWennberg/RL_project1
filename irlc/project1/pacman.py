@@ -122,20 +122,17 @@ def shortest_path(map, N=10):
     The actions should be the list of actions taken.
     The states should be a list of states the agent visit. The first should be the initial state and the last
     should be the won state. """
-    # TODO: 4 lines missing.
     env = PacmanEnvironment(layout_str=map, render_mode='human')
     x, info = env.reset()
-    if x.is_won():
-        return [], [x]
+    J, pi = DP_stochastic(DPModel(p_next, lambda x, a: -1 if x.is_won() else 0), N)
     states = [x]
     actions = []
     for k in range(N):
-        action = get_future_states(x, N=k+1)[k+1] # Select the shortest path
-        actions.append(action)
-        x, reward, done, info = env.step(action)
-        states.append(x)
         if x.is_won():
-            break   
+            break
+        actions.append(pi[k][x])
+        x, reward, done, info = env.step(pi[k][x])
+        states.append(x)
     return actions, states  
 
 
