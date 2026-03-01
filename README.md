@@ -18,3 +18,24 @@ In case a package has been updated, please run:
 conda activate irlcenv
 conda env update --file environment.yml --prune
 ```
+
+
+# Kiosk
+
+Problem 1:
+- Creating classes: KioskEnvironment and KioskDPModel
+- inserting probabilities for how many blasters are bought a day, 30%, 60% and 10%
+- set state space to n=20
+- set action space to 15
+- define cost function: cost of buying is 1,5 credit, and overnight all inventory above 20 should be removed
+
+Got figure: ![alt text](image.png)
+- this is the optimal policy
+- x-axis is days from 0-14 and y-axis is how many items in stock
+- if few items in stock, yellow/green color means order many items, whereas purple means order few/none, which can be seen in areas where stock is fuller
+- as time runs out, the optimal policy also orders less aggressively as high stock has no value in the end of the horizon
+
+The DP thereby:
+- understands uncertainty in demand
+- respects ordering cost
+- avoids end-of-horizon waste

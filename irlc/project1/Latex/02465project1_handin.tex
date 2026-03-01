@@ -74,12 +74,12 @@ Headings have been inserted in the document for readability. You only have to ed
 \yoursolution 	
 \redt{Include the following elements: \begin{align}
 	N & = 14 \\
-	\mbox{for $k=0,\dots,N$: }\quad	\mathcal{S}_k & = \dots \\
-	\mbox{for $k=0,\dots,N-1$: }\quad \mathcal{A}_k(x_k) & = \dots \\
-    \mbox{for $k=0,\dots,N-1$: }\quad f_k(x_k, u_k, w_k) & = \dots \\
-	\mbox{for $k=0,\dots,N-1$: }\quad g_k(x_k, u_k, w_k) & = \dots \\
-	g_N(x_N) & = \dots \\
-    \mbox{for $k=0,\dots,N-1$: }\quad P_W(w_k | x_k, u_k) & = \dots
+	\mbox{for $k=0,\dots,N$: }\quad	\mathcal{S}_k & = \{0,1, \dots, 20\\} \\
+	\mbox{for $k=0,\dots,N-1$: }\quad \mathcal{A}_k(x_k) & = \{0,1, \dots, 15\\} \\
+    \mbox{for $k=0,\dots,N-1$: }\quad f_k(x_k, u_k, w_k) & = max(0, min(n_s, x + u - w)) \\
+	\mbox{for $k=0,\dots,N-1$: }\quad g_k(x_k, u_k, w_k) & = c_o \cdot u_k - s_p \cdot min(x_k + u_k, w_k) \\
+	g_N(x_N) & = 0 \\
+    \mbox{for $k=0,\dots,N-1$: }\quad P_W(w_k | x_k, u_k) & = {0:.3, 3:.6, 6:0.1}
 \end{align} }
 
 \subsubsection*{{\color{red}Problem 3:  Manually computing $J_{N-1}$}}
@@ -88,7 +88,18 @@ Headings have been inserted in the document for readability. You only have to ed
 	$$
 	J_{N-1}(20)  = \min_{u_{N-1} } \EE_{w_{N-1} }\left[ g_{N-1}(20, u_{N-1}, w_{N-1} ) +  g_N(x_N) \right]
 	$$
-	Therefore ...
+	Therefore:
+	As the the final cost (g_n) is zero that term can be ignored. Moreover, the cost function g_{N-1} can be inserted:
+	J_{N-1}(20) = \min_{u_{N-1} } \EE_{w_{N-1} }\left[ 1.5 \cdot u_{N-1} - 2.1 \cdot min(20 + u_{N-1}, w_{N-1})\right]
+	As we are told the stock is 20, the minimum of 20 + u_{N-1} and w_{N-1} will always be w_{N-1}. 
+	Therefore, the cost function can be simplified to:
+	J_{N-1}(20) = \min_{u_{N-1} } \EE_{w_{N-1} }\left[ 1.5 \cdot u_{N-1} - 2.1 \cdot w_{N-1}\right]
+	Because the expectation is linear, the expectation can be put inside the brackets as follows:
+	J_{N-1}(20) = \min_{u_{N-1} } \left[ 1.5 \cdot u_{N-1} - 2.1 \cdot \EE_{w_{N-1} }\right]
+	Then the expectation of w can be calculated, but as it does not depend on u, we can minimise 1.5*u with the smallest possible action u=0, resulting in 1.5*0=0.
+	Therefore, the cost function can be simplified to:
+	J_{N-1}(20) = 0 - 2.1 \cdot (0 \cdot 0.3 + 3 \cdot 0.6 + 6 \cdot 0.1) = -5.04
+	Thereby the expected profit when starting with fulls tock and choosing action u=0 is 5.04.
 	
 \subsubsection*{{\color{red}Problem 6:  Policy explanation continued}}
 	
