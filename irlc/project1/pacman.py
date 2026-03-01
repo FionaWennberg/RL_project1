@@ -67,8 +67,8 @@ def p_next(x : GameState, u: str):
     p_next_dict = defaultdict(float)  # This is a dictionary that will store the next states and their probabilities. You can use it like a normal dictionary, but it will return 0 for keys that are not present.
     xp = x.next(u)  # This is the next state if there are no ghosts. You can check this by printing xp and str(xp).
     p_next_dict[xp] += 1.0  # This is the probability of transitioning to xp. We will update this when we consider the ghosts.
-
-    return states
+    
+    return p_next_dict
 
 
 def go_east(map): 
@@ -99,7 +99,16 @@ def go_east(map):
 
 def get_future_states(x, N): 
     # TODO: 4 lines missing.
-    raise NotImplementedError("return a list-of-list of future states [S_0, ... ,S_N]. Each S_k is a state space, i.e. a list of GameState objects.")
+    state_spaces = {}
+    state_spaces[0] = [x]
+    for k in range(1, N+1):
+        state_spaces[k] = []
+        for s in state_spaces[k-1]:
+            for a in s.A(): # The first action by the agent
+                p = p_next(s, a) # The possible next states and their probabilities
+                for xp, prob in p.items(): 
+                    if xp not in state_spaces[k]: # Check if we have already added this state to the list of states at time k
+                        state_spaces[k].append(xp)  
     return state_spaces
 
 def win_probability(map, N=10): 
@@ -114,8 +123,20 @@ def shortest_path(map, N=10):
     The states should be a list of states the agent visit. The first should be the initial state and the last
     should be the won state. """
     # TODO: 4 lines missing.
-    raise NotImplementedError("Return the cost of the shortest path, the list of actions taken, and the list of states.")
-    return actions, states
+    env = PacmanEnvironment(layout_str=map, render_mode='human')
+    x, info = env.reset()
+    if x.is_won():
+        return [], [x]
+    states = [x]
+    actions = []
+    for k in range(N):
+        action = get_future_states(x, N=k+1)[k+1] # Select the shortest path
+        actions.append(action)
+        x, reward, done, info = env.step(action)
+        states.append(x)
+        if x.is_won():
+            break   
+    return actions, states  
 
 
 def no_ghosts():
