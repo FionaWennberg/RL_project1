@@ -47,7 +47,7 @@ datadiscs = """
 """
 
 # TODO: 30 lines missing.
-raise NotImplementedError("Put your own code here")
+# raise NotImplementedError("Put your own code here")
 
 def p_next(x : GameState, u: str): 
     """ Given the agent is in GameState x and takes action u, the game will transition to a new state xp.
@@ -92,7 +92,7 @@ def go_east(map):
 
     while not x.is_won():
         action = x.A()[0]  # This makes it take the first legal action which happens to be east in the maps we will test on. You can check this by printing x.A() and str(x) to see the map.
-        x, reward, done, info = env.step(action)
+        x, reward, done, truncated, info = env.step(action)
         states.append(x)
 
     return states
@@ -131,7 +131,8 @@ def shortest_path(map, N=10):
         if x.is_won():
             break
         actions.append(pi[k][x])
-        x, reward, done, info = env.step(pi[k][x])
+        x, reward, done, truncated, info = env.step(actions[-1])
+
         states.append(x)
     return actions, states  
 

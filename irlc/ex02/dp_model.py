@@ -1,5 +1,10 @@
 # This file may not be shared/redistributed without permission. Please read copyright notice in the git repo. If this file contains other copyright notices disregard this text.
 import numpy as np
+from irlc.pacman.pacman_environment import PacmanEnvironment
+from irlc.pacman.gamestate import GameState
+from project1.pacman import p_next, get_future_states
+
+
 
 class DPModel: 
     r""" The Dynamical Programming model class
@@ -74,7 +79,7 @@ class DPModel:
         :param k: The current time step :math:`k`
         :return: The state the environment (deterministically) transitions to, i.e. :math:`x_{k+1}`
         """
-        raise NotImplementedError("Return f_k(x,u,w)")
+        return w
 
     def g(self, x, u, w, k: int) -> float:
         """
@@ -86,7 +91,7 @@ class DPModel:
         :param k: The current time step :math:`k`
         :return: The cost (as a ``float``) incurred by the environment, i.e. :math:`g_k(x, u, w)`
         """
-        raise NotImplementedError("Return g_k(x,u,w)")
+        return 0 if x.is_won() else 1
 
     def gN(self, x) -> float:
         """
@@ -109,7 +114,7 @@ class DPModel:
         :param k: The current time step :math:`k`
         :return: The state space (as a ``list`` or ``set``) available at time step ``k``, i.e. :math:`\mathcal S_k`
         """
-        raise NotImplementedError("Return state space as set S_k = {x_1, x_2, ...}")
+        return get_future_states[k] 
 
     def A(self, x, k: int):
         r"""
@@ -124,8 +129,8 @@ class DPModel:
         :param x: The state we want to compute the actions in :math:`x_k`
         :return: The action space (as a ``list`` or ``set``) available at time step ``k``, i.e. :math:`\mathcal A_k(x_k)`
         """
-        raise NotImplementedError("Return action space as set A(x_k) = {u_1, u_2, ...}")
-
+        return x.A()
+    
     def Pw(self, x, u, k: int):
         """
         Returns the random noise disturbances and their probability. In other words, this function implements the distribution:
@@ -160,7 +165,7 @@ class DPModel:
         """
         # Compute and return the random noise disturbances here.
         # As an example:
-        return {'w_dummy': 1/3, 42: 2/3}  # P(w_k="w_dummy") = 1/3, P(w_k =42)=2/3. 
+        return p_next(x, u) # P(w_k="w_dummy") = 1/3, P(w_k =42)=2/3. 
 
     def w_rnd(self, x, u, k): 
         r"""
