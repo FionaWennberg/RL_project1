@@ -64,10 +64,13 @@ class PacmanDP(DPModel):
         return x.A()
 
     def gN(self, x):
-        return 0
+        return -1 if x.is_won() else 0
+    
+    def Pw(self, x, u, k):
+        return p_next(x, u)
     
     def g(self, x, u, w, k: int):
-        return -1 if w.is_won() else 0
+        return 0
     
     def f(self, x, u, w, k: int):
         return w
@@ -142,9 +145,10 @@ def get_future_states(x, N):
 
 def win_probability(map, N=10): 
     """ Assuming you get a reward of -1 on wining (and otherwise zero), the win probability is -J_pi(x_0). """
-    # TODO: 5 lines missing.
-    raise NotImplementedError("Return the chance of winning the given map within N steps or less.")
-    return win_probability
+    model = PacmanDP(map, N)
+    J, pi = DP_stochastic(model)
+    x0 = model.x0()
+    return -J[0][x0]
 
 def shortest_path(map, N=10): 
     """ If each move has a cost of 1, the shortest path is the path with the lowest cost.
