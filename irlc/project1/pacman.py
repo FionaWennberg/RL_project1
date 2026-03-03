@@ -89,11 +89,10 @@ def p_next(x : GameState, u: str):
         * The slightly tricky part is that when there are multiple ghosts, different actions by the individual ghosts may lead to the same final state
         * Check the probabilities sum to 1. This will be your main way of debugging your code and catching issues relating to the previous point.
     """
-    p_next_dict = defaultdict(float)  # This is a dictionary that will store the next states and their probabilities. You can use it like a normal dictionary, but it will return 0 for keys that are not present.
-    xp = x.next(u)  # This is the next state if there are no ghosts. You can check this by printing xp and str(xp).
-    p_next_dict[xp] += 1.0  # This is the probability of transitioning to xp. We will update this when we consider the ghosts.
-    
-    return p_next_dict
+    p_next = defaultdict(float)
+    for w in x.W(u):  
+        p_next[w] += 1.0 / len(x.W(u))
+    return dict(p_next)  
 
 
 def go_east(map): 
@@ -123,17 +122,17 @@ def go_east(map):
     return states
 
 def get_future_states(x, N): 
-    # TODO: 4 lines missing.
-    state_spaces = {}
-    state_spaces[0] = [x]
-    for k in range(1, N+1):
-        state_spaces[k] = []
-        for s in state_spaces[k-1]:
-            for a in s.A(): # The first action by the agent
-                p = p_next(s, a) # The possible next states and their probabilities
-                for xp, prob in p.items(): 
-                    if xp not in state_spaces[k]: # Check if we have already added this state to the list of states at time k
-                        state_spaces[k].append(xp)  
+    state_spaces = [[x]]
+    for k in range(N):
+        sk = state_spaces[k]
+        sk_next = []
+        for s in sk:
+            for u in s.A():
+                p = p_next(s, u)   # returns dict {xp: prob}
+                for xp in p.keys():
+                    if xp not in sk_next:
+                        sk_next.append(xp)
+        state_spaces.append(sk_next)
     return state_spaces
 
 def win_probability(map, N=10): 
