@@ -52,7 +52,7 @@ class PacmanDP(DPModel):
         super().__init__(N)
         env = PacmanEnvironment(layout_str=map_layout, render_mode=None)
         self._x0, _ = env.reset()
-        self._S = get_future_states(self._x0, N)  # MUST be list of length N+1
+        self._S = get_future_states(self._x0, N)  
 
     def x0(self):
         return self._x0
@@ -63,11 +63,9 @@ class PacmanDP(DPModel):
     def A(self, x, k: int):
         return x.A()
 
-    def Pw(self, x, u, k: int):
-        return p_next(x, u)
-
     def gN(self, x):
         return 0
+    
     def g(self, x, u, w, k: int):
         return -1 if w.is_won() else 0
     
@@ -89,10 +87,17 @@ def p_next(x : GameState, u: str):
         * The slightly tricky part is that when there are multiple ghosts, different actions by the individual ghosts may lead to the same final state
         * Check the probabilities sum to 1. This will be your main way of debugging your code and catching issues relating to the previous point.
     """
-    p_next = defaultdict(float)
-    for w in x.W(u):  
-        p_next[w] += 1.0 / len(x.W(u))
-    return dict(p_next)  
+    p = defaultdict(float)
+    xp = x.f(u)
+    if xp.is_won() or xp.is_lost():
+        p[xp] = 1.0
+    else:
+        ghost_actions = xp.A()
+        pg = 1.0 / len(ghost_actions)
+        for action in ghost_actions:
+            xp_next = xp.f(action)
+            p[xp_next] += pg 
+    return dict(p)  
 
 
 def go_east(map): 
