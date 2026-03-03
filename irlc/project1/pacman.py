@@ -47,7 +47,32 @@ datadiscs = """
 """
 
 # TODO: 30 lines missing.
-# raise NotImplementedError("Put your own code here")
+class PacmanDP(DPModel):
+    def __init__(self, map_layout: str, N: int):
+        super().__init__(N)
+        env = PacmanEnvironment(layout_str=map_layout, render_mode=None)
+        self._x0, _ = env.reset()
+        self._S = get_future_states(self._x0, N)  # MUST be list of length N+1
+
+    def x0(self):
+        return self._x0
+
+    def S(self, k: int):
+        return self._S[k]
+
+    def A(self, x, k: int):
+        return x.A()
+
+    def Pw(self, x, u, k: int):
+        return p_next(x, u)
+
+    def gN(self, x):
+        return 0
+    def g(self, x, u, w, k: int):
+        return -1 if w.is_won() else 0
+    
+    def f(self, x, u, w, k: int):
+        return w
 
 def p_next(x : GameState, u: str): 
     """ Given the agent is in GameState x and takes action u, the game will transition to a new state xp.
@@ -122,18 +147,25 @@ def shortest_path(map, N=10):
     The actions should be the list of actions taken.
     The states should be a list of states the agent visit. The first should be the initial state and the last
     should be the won state. """
+    model = PacmanDP(map, N)
+    J, pi = DP_stochastic(model)
+
     env = PacmanEnvironment(layout_str=map, render_mode='human')
     x, info = env.reset()
-    J, pi = DP_stochastic(DPModel(p_next, lambda x, a: -1 if x.is_won() else 0), N)
+
     states = [x]
     actions = []
+
     for k in range(N):
         if x.is_won():
             break
-        actions.append(pi[k][x])
-        x, reward, done, truncated, info = env.step(actions[-1])
-
+        u = pi[k][x]
+        actions.append(u)
+        x, reward, done, truncated, info = env.step(u)  # 5 outputs
         states.append(x)
+        if done or truncated:
+            break
+
     return actions, states  
 
 
