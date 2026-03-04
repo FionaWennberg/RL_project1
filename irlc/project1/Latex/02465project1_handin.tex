@@ -103,8 +103,28 @@ Headings have been inserted in the document for readability. You only have to ed
 	
 \subsubsection*{{\color{red}Problem 6:  Policy explanation continued}}
 	
-	$$\mu_{N-1}(0) = \argmin_u \EE_{w} \left[g_k(0, u, w) + g_N( f(0,u,w) ) \right] = \cdots $$
+	$$\mu_{N-1}(0) = \argmin_u \EE_{w} \left[g_k(0, u, w) + g_N( f(0,u,w) ) \right] $$
 \yoursolution
+
+Computing how many blasters would be bought the last day given that the inventory is empty, 
+when following the first policy
+$$\mu_{N-1}(0) = \argmin_u \EE_{w} \left[g_k(0, u, w) + g_N( f(0,u,w) ) \right] $$
+$$\mu_{N-1}(0) = \argmin_u \EE_{w} \left[c_o*u - s_p*min(0+u,w) + 0 \right]  $$
+$$\mu_{N-1}(0) = \argmin_u \EE_{w} \left[c_o*u - s_p*min(0+u,w) + 0 \right] $$
+
+Now calcualting the expected value for the demand:
+$$\mu_{N-1}(0) = \argmin_u \left[c_o*u - s_p*\EE_{w}[min(0+u,w)] + 0 \right] $$
+$$ \EE_{w}[min(0+u,w)] = 0.3*min(0+u,0) + 0.6*min(0+u,3) + 0.1*min(0+u,6) $$
+
+Since W belongs to {0,3,6}, the E[min(u,W)] is a piecewise linear function of u, with breakpoints at 0,3 and 6.
+This means that the minimum of the cost function will be at one of those breakpoints.
+Therefore, we can evaluate the cost function at those breakpoints to find the minimum cost:
+u=0: J(0) = 1.5*0 - 2.1*(0.3*0 + 0.6*0 + 0.1*0) = 0
+u=3: J(3) = 1.5*3 - 2.1*(0.3*0 + 0.6*3 + 0.1*3) = 0.09
+u=6: J(6) = 1.5*6 - 2.1*(0.3*0 + 0.6*3 + 0.1*6) = 3.96
+
+This shows that the smallet cost is obtained, when u=0.
+This means that according to the first policy, the optimal action is to not buy any blasters the last day.
 
 \section{Avoid the droid (\texttt{pacman.py)}} 
 \end{document}
