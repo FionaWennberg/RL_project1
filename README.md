@@ -22,7 +22,7 @@ conda env update --file environment.yml --prune
 
 # Kiosk
 
-Problem 1:
+Problem 1 & 2:
 - Creating classes: KioskEnvironment and KioskDPModel
 - inserting probabilities for how many blasters are bought a day, 30%, 60% and 10%
 - set state space to n=20
