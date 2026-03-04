@@ -86,6 +86,16 @@ class KioskDPModel(DPModel):
 
     def gN(self, x):
         return 0 
+    
+class Kiosk2DPModel(KioskDPModel):
+    def g(self, x, u, w, k): # Cost function g_k(x,u,w)
+        return c_o*u - s_p*min(x+u,w) + 3*max(0, x+u-w-n_s) # cost is negative profit, and the last term is the penalty of 3 credits for having more than 20 blasters after the day, as they have to be discarded
+    
+    def Pw(self, x, u, k): # Distribution over random disturbances
+        w_s = np.arange(0, n_s+1)
+        p_s = binom.pmf(w_s, n_s, 1/5)
+        return {int(w): float(p) for w, p in zip(w_s, p_s)}
+
 
 
 def warmup_states(): 
@@ -104,7 +114,10 @@ def solve_kiosk_1():
 
 def solve_kiosk_2(): 
     # TODO: 1 lines missing.
-    raise NotImplementedError("Return cost and policy here (same format as DP_stochastic)")
+    model = Kiosk2DPModel(N=N_DEFAULT)
+    J, pi = DP_stochastic(model) # solve the problem using DP_stochastic and return cost and policy
+    return J, pi
+
 
 
 def main():
