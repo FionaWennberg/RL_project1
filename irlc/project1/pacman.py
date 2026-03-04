@@ -1,5 +1,6 @@
 # This file may not be shared/redistributed without permission. Please read copyright notice in the git repo. If this file contains other copyright notices disregard this text.
 from collections import defaultdict
+from pyexpat import model
 from irlc import train
 from irlc.ex02.dp_model import DPModel
 from irlc.ex02.dp import DP_stochastic
@@ -64,7 +65,7 @@ class PacmanDP(DPModel):
         return x.A()
 
     def gN(self, x):
-        return -1 if x.is_won() else 0
+        return -1 if x.is_won() else 0 # For problem 10, this should be changed to 0 for winning states
     
     def Pw(self, x, u, k):
         return p_next(x, u)
@@ -93,14 +94,29 @@ def p_next(x : GameState, u: str):
     p = defaultdict(float)
     xp = x.f(u)
     if xp.is_won() or xp.is_lost():
-        p[xp] = 1.0
-    else:
-        ghost_actions = xp.A()
-        pg = 1.0 / len(ghost_actions)
-        for action in ghost_actions:
-            xp_next = xp.f(action)
-            p[xp_next] += pg 
-    return dict(p)  
+        return {xp:1.0}
+    n_ghosts = xp.players() -1
+
+    dist = {xp: 1.0}
+
+    for _ in range(n_ghosts):
+        new_dist = defaultdict(float)
+
+        for s, ps in dist.items():
+            # If a terminal state appears mid-way, keep it as absorbing
+            if s.is_won() or s.is_lost():
+                new_dist[s] += ps
+                continue
+
+            actions = s.A()              # actions for the current ghost whose turn it is in state s
+            pg = 1.0 / len(actions)
+
+            for a in actions:
+                s2 = s.f(a)              # ghost takes action
+                new_dist[s2] += ps * pg  # accumulate probability (merge duplicates)
+
+        dist = new_dist
+    return dict(dist)  
 
 
 def go_east(map): 
@@ -158,8 +174,7 @@ def shortest_path(map, N=10):
     model = PacmanDP(map, N)
     J, pi = DP_stochastic(model)
 
-    env = PacmanEnvironment(layout_str=map, render_mode='human')
-    x, info = env.reset()
+    x = model.x0()
 
     states = [x]
     actions = []
@@ -169,11 +184,8 @@ def shortest_path(map, N=10):
             break
         u = pi[k][x]
         actions.append(u)
-        x, reward, done, truncated, info = env.step(u)  # 5 outputs
+        x = x.f(u) 
         states.append(x)
-        if done or truncated:
-            break
-
     return actions, states  
 
 
